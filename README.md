@@ -25,6 +25,12 @@ From repo root:
 ./install.sh
 ```
 
+To skip Ghostty config:
+
+```bash
+./install.sh --without-ghostty
+```
+
 `install.sh` detects OS and dispatches to:
 
 - macOS: `install/install-macos.sh`

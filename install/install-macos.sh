@@ -4,6 +4,21 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 MYSHELL_ROOT="${MYSHELL_CONFIG_ROOT:-$HOME/.config/myshell}"
+WITHOUT_GHOSTTY=0
+
+while (($# > 0)); do
+  case "$1" in
+  --without-ghostty)
+    WITHOUT_GHOSTTY=1
+    shift
+    ;;
+  *)
+    echo "Unknown argument: $1"
+    echo "Usage: ./install/install-macos.sh [--without-ghostty]"
+    exit 1
+    ;;
+  esac
+done
 
 if [[ "$(uname -s)" != "Darwin" ]]; then
   echo "This installer is for macOS. Use ./install-linux.sh on Linux."
@@ -84,7 +99,11 @@ echo "Shell config target: $MYSHELL_ROOT"
 ensure_homebrew
 install_dependencies
 install_shell_config
-install_ghostty_config
+if [[ "$WITHOUT_GHOSTTY" == "1" ]]; then
+  echo "Skipping Ghostty config (--without-ghostty)."
+else
+  install_ghostty_config
+fi
 
 SKIP_NVIM_DEPS=1 "$SCRIPT_DIR/install-nvim-macos.sh"
 
