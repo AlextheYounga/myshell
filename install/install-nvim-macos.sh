@@ -3,7 +3,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-SOURCE_MD="$PROJECT_ROOT/.agent/nvim-configs.md"
+SOURCE_NVIM_DIR="$PROJECT_ROOT/config/nvim"
+SOURCE_STARSHIP="$PROJECT_ROOT/config/starship.toml"
 NVIM_DIR="$HOME/.config/nvim"
 STARSHIP_FILE="$HOME/.config/starship.toml"
 LOCAL_BIN="$HOME/.local/bin"
@@ -39,38 +40,17 @@ install_dependencies() {
   brew install "${packages[@]}"
 }
 
-if [[ ! -f "$SOURCE_MD" ]]; then
-  echo "Missing source file: $SOURCE_MD"
+if [[ ! -d "$SOURCE_NVIM_DIR" ]]; then
+  echo "Missing source directory: $SOURCE_NVIM_DIR"
   exit 1
 fi
 
-extract_block() {
-  local key="$1"
-  local out="$2"
-  awk -v p="$key" '
-    $0 == "`" p "`:" { found = 1; next }
-    found && !in_block && /^```/ { in_block = 1; next }
-    in_block && /^```[[:space:]]*$/ { exit }
-    in_block { print }
-  ' "$SOURCE_MD" > "$out"
-}
+if [[ ! -f "$SOURCE_STARSHIP" ]]; then
+  echo "Missing source file: $SOURCE_STARSHIP"
+  exit 1
+fi
 
-write_from_md() {
-  local key="$1"
-  local dst="$2"
-  local tmp
-  tmp="$(mktemp)"
-  extract_block "$key" "$tmp"
-  if [[ ! -s "$tmp" ]]; then
-    rm -f "$tmp"
-    echo "Failed to extract block for: $key"
-    exit 1
-  fi
-  mkdir -p "$(dirname "$dst")"
-  mv "$tmp" "$dst"
-}
-
-echo "Installing Neovim config from $SOURCE_MD"
+echo "Installing Neovim config from $SOURCE_NVIM_DIR"
 if [[ "${SKIP_NVIM_DEPS:-0}" != "1" ]]; then
   ensure_homebrew
   install_dependencies
@@ -79,26 +59,11 @@ fi
 if [[ -d "$NVIM_DIR" ]]; then
   mv "$NVIM_DIR" "${NVIM_DIR}.bak.${timestamp}"
 fi
-mkdir -p "$NVIM_DIR"
+mkdir -p "$(dirname "$NVIM_DIR")"
+cp -R "$SOURCE_NVIM_DIR" "$NVIM_DIR"
 
-write_from_md "nvim/init.lua" "$NVIM_DIR/init.lua"
-write_from_md "nvim/lazy-lock.json" "$NVIM_DIR/lazy-lock.json"
-write_from_md "nvim/lazyvim.json" "$NVIM_DIR/lazyvim.json"
-write_from_md "nvim/lua/config/autocmds.lua" "$NVIM_DIR/lua/config/autocmds.lua"
-write_from_md "nvim/lua/config/keymaps.lua" "$NVIM_DIR/lua/config/keymaps.lua"
-write_from_md "nvim/lua/config/lazy.lua" "$NVIM_DIR/lua/config/lazy.lua"
-write_from_md "nvim/lua/config/options.lua" "$NVIM_DIR/lua/config/options.lua"
-write_from_md "nvim/lua/plugins/all-themes.lua" "$NVIM_DIR/lua/plugins/all-themes.lua"
-write_from_md "nvim/lua/plugins/disable-news-alert.lua" "$NVIM_DIR/lua/plugins/disable-news-alert.lua"
-write_from_md "nvim/lua/plugins/omarchy-theme-hotreload.lua" "$NVIM_DIR/lua/plugins/omarchy-theme-hotreload.lua"
-write_from_md "nvim/lua/plugins/snacks-animated-scrolling-off.lua" "$NVIM_DIR/lua/plugins/snacks-animated-scrolling-off.lua"
-write_from_md "nvim/lua/plugins/theme.lua" "$NVIM_DIR/lua/plugins/theme.lua"
-write_from_md "nvim/plugin/after/transparency.lua" "$NVIM_DIR/plugin/after/transparency.lua"
-write_from_md "nvim/stylua.toml" "$NVIM_DIR/stylua.toml"
-write_from_md "nvim/README.md" "$NVIM_DIR/README.md"
-write_from_md "nvim/LICENSE" "$NVIM_DIR/LICENSE"
-
-write_from_md "starship.toml" "$STARSHIP_FILE"
+mkdir -p "$(dirname "$STARSHIP_FILE")"
+cp "$SOURCE_STARSHIP" "$STARSHIP_FILE"
 sed -i '' 's|^command = "/usr/local/bin/gitdiffstats"|command = "gitdiffstats"|' "$STARSHIP_FILE"
 
 if [[ -f "$GITDIFFSTATS_SRC" ]]; then

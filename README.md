@@ -78,7 +78,8 @@ Assumption:
 
 Source of truth:
 
-- `.agent/nvim-configs.md` (Markdown file containing extracted config blocks)
+- `config/nvim/` (real Neovim config tree)
+- `config/starship.toml`
 
 Installed by:
 
@@ -88,8 +89,8 @@ Installed by:
 Behavior:
 
 - Backs up existing `~/.config/nvim` to `~/.config/nvim.bak.<timestamp>`.
-- Extracts and writes Neovim files from `.agent/nvim-configs.md`.
-- Writes `~/.config/starship.toml` from the same markdown.
+- Copies `config/nvim/` to `~/.config/nvim`.
+- Copies `config/starship.toml` to `~/.config/starship.toml`.
 - Rewrites this line in starship config:
   - from `command = "/usr/local/bin/gitdiffstats"`
   - to `command = "gitdiffstats"`
@@ -164,7 +165,7 @@ Then calls:
 
 1. You run installers from repo root.
 2. Ghostty is already installed.
-3. `.agent/nvim-configs.md` exists and contains expected code-block labels.
+3. `config/nvim/` and `config/starship.toml` exist.
 4. `install/gitdiffstats.sh` exists.
 5. Linux support is currently Debian/Ubuntu (apt), not all distros.
 6. You are okay with installer-managed changes to:
@@ -202,7 +203,6 @@ After editing files in this repo:
 
 - No built-in `--dry-run` flag yet.
 - Linux installer is not universal across all distributions.
-- Neovim extraction depends on stable markdown block labels in `.agent/nvim-configs.md`.
 
 ## Quick Troubleshooting
 
