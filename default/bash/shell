@@ -16,5 +16,5 @@ if [[ -z "${BASH_COMPLETION_VERSINFO+x}" ]]; then
   fi
 fi
 
-# Ensure command hashing is off for mise
-set +h
+# Keep command lookups fresh without disabling `hash` builtin.
+shopt -s checkhash

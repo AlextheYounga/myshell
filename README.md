@@ -25,10 +25,10 @@ From repo root:
 ./install.sh
 ```
 
-To skip Ghostty config:
+To include Ghostty config:
 
 ```bash
-./install.sh --without-ghostty
+./install.sh --with-ghostty
 ```
 
 `install.sh` detects OS and dispatches to:
