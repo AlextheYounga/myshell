@@ -5,7 +5,8 @@ HISTSIZE=32768
 HISTFILESIZE="${HISTSIZE}"
 
 # Autocompletion
-if [[ ! -v BASH_COMPLETION_VERSINFO ]]; then
+# Bash 3.2 (macOS default) does not support [[ -v var ]].
+if [[ -z "${BASH_COMPLETION_VERSINFO+x}" ]]; then
   if [[ -f /usr/share/bash-completion/bash_completion ]]; then
     source /usr/share/bash-completion/bash_completion
   elif [[ -f /opt/homebrew/etc/profile.d/bash_completion.sh ]]; then
