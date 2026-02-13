@@ -36,6 +36,41 @@ To include Ghostty config:
 - macOS: `install/install-macos.sh`
 - Linux: `install/install-linux.sh`
 
+## Uninstall
+
+From repo root:
+
+```bash
+./uninstall.sh
+```
+
+Preview only (no changes):
+
+```bash
+./uninstall.sh --dry-run
+```
+
+What `uninstall.sh` removes:
+
+- `~/.config/myshell` (or `$MYSHELL_CONFIG_ROOT` if set)
+- `~/.config/nvim`
+- `~/.config/starship.toml`
+- `~/.local/bin/gitdiffstats`
+- injected lines in:
+  - `~/.bashrc` (`source ~/.config/myshell/bash/rc`)
+  - `~/.bash_profile` (`[[ -f ~/.bashrc ]] && . ~/.bashrc`)
+- `~/.config/ghostty/config` only if it still matches this repo's template exactly
+
+What it does **not** remove:
+
+- system packages installed by `brew` / `apt`
+- custom Ghostty config if you changed it from this repo template
+
+Safety behavior:
+
+- Any removed/edited files are backed up to:
+  - `~/.config/myshell-uninstall-backup-<timestamp>/`
+
 ## What Gets Installed
 
 ## 1) Shell
