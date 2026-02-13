@@ -1,41 +1,44 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SOURCE_MD="$REPO_ROOT/.agent/nvim-configs.md"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+SOURCE_MD="$PROJECT_ROOT/.agent/nvim-configs.md"
 NVIM_DIR="$HOME/.config/nvim"
 STARSHIP_FILE="$HOME/.config/starship.toml"
 LOCAL_BIN="$HOME/.local/bin"
-GITDIFFSTATS_SRC="$REPO_ROOT/gitdiffstats.sh"
+GITDIFFSTATS_SRC="$SCRIPT_DIR/gitdiffstats.sh"
 GITDIFFSTATS_DST="$LOCAL_BIN/gitdiffstats"
 timestamp="$(date +%Y%m%d-%H%M%S)"
 
-if [[ "$(uname -s)" != "Darwin" ]]; then
-  echo "This installer is for macOS. Use ./install-nvim-linux.sh on Linux."
+if [[ "$(uname -s)" != "Linux" ]]; then
+  echo "This installer is for Linux. Use ./install-nvim-macos.sh on macOS."
   exit 1
 fi
 
-ensure_homebrew() {
-  if command -v brew >/dev/null 2>&1; then
-    return
+ensure_apt() {
+  if ! command -v apt-get >/dev/null 2>&1; then
+    echo "This Linux installer currently supports Debian/Ubuntu (apt-get)."
+    exit 1
   fi
-  echo "Homebrew is required and was not found."
-  echo "Install Homebrew first, then rerun this script:"
-  echo '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
-  exit 1
 }
 
 install_dependencies() {
-  local packages=(
-    git
-    neovim
-    ripgrep
-    fd
-    fzf
-    curl
+  sudo apt-get update
+  sudo apt-get install -y \
+    build-essential \
+    curl \
+    fd-find \
+    fzf \
+    git \
+    neovim \
+    ripgrep \
     unzip
-  )
-  brew install "${packages[@]}"
+
+  mkdir -p "$HOME/.local/bin"
+  if command -v fdfind >/dev/null 2>&1 && ! command -v fd >/dev/null 2>&1; then
+    ln -sf "$(command -v fdfind)" "$HOME/.local/bin/fd"
+  fi
 }
 
 if [[ ! -f "$SOURCE_MD" ]]; then
@@ -71,7 +74,7 @@ write_from_md() {
 
 echo "Installing Neovim config from $SOURCE_MD"
 if [[ "${SKIP_NVIM_DEPS:-0}" != "1" ]]; then
-  ensure_homebrew
+  ensure_apt
   install_dependencies
 fi
 
@@ -98,7 +101,7 @@ write_from_md "nvim/README.md" "$NVIM_DIR/README.md"
 write_from_md "nvim/LICENSE" "$NVIM_DIR/LICENSE"
 
 write_from_md "starship.toml" "$STARSHIP_FILE"
-sed -i '' 's|^command = "/usr/local/bin/gitdiffstats"|command = "gitdiffstats"|' "$STARSHIP_FILE"
+sed -i 's|^command = "/usr/local/bin/gitdiffstats"|command = "gitdiffstats"|' "$STARSHIP_FILE"
 
 if [[ -f "$GITDIFFSTATS_SRC" ]]; then
   mkdir -p "$LOCAL_BIN"

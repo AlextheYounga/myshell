@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 MYSHELL_ROOT="${MYSHELL_CONFIG_ROOT:-$HOME/.config/myshell}"
 
 if [[ "$(uname -s)" != "Darwin" ]]; then
@@ -43,16 +44,16 @@ install_dependencies() {
 install_shell_config() {
   mkdir -p "$MYSHELL_ROOT/bash"
 
-  cp "$REPO_ROOT/default/bash/aliases" "$MYSHELL_ROOT/bash/aliases"
-  cp "$REPO_ROOT/default/bash/envs" "$MYSHELL_ROOT/bash/envs"
-  cp "$REPO_ROOT/default/bash/functions" "$MYSHELL_ROOT/bash/functions"
-  cp "$REPO_ROOT/default/bash/init" "$MYSHELL_ROOT/bash/init"
-  cp "$REPO_ROOT/default/bash/inputrc" "$MYSHELL_ROOT/bash/inputrc"
-  cp "$REPO_ROOT/default/bash/rc" "$MYSHELL_ROOT/bash/rc"
-  cp "$REPO_ROOT/default/bash/shell" "$MYSHELL_ROOT/bash/shell"
+  cp "$PROJECT_ROOT/default/bash/aliases" "$MYSHELL_ROOT/bash/aliases"
+  cp "$PROJECT_ROOT/default/bash/envs" "$MYSHELL_ROOT/bash/envs"
+  cp "$PROJECT_ROOT/default/bash/functions" "$MYSHELL_ROOT/bash/functions"
+  cp "$PROJECT_ROOT/default/bash/init" "$MYSHELL_ROOT/bash/init"
+  cp "$PROJECT_ROOT/default/bash/inputrc" "$MYSHELL_ROOT/bash/inputrc"
+  cp "$PROJECT_ROOT/default/bash/rc" "$MYSHELL_ROOT/bash/rc"
+  cp "$PROJECT_ROOT/default/bash/shell" "$MYSHELL_ROOT/bash/shell"
 
   if [[ ! -f "$HOME/.bashrc" ]]; then
-    cp "$REPO_ROOT/default/bashrc" "$HOME/.bashrc"
+    cp "$PROJECT_ROOT/default/bashrc" "$HOME/.bashrc"
   else
     source_line='source ~/.config/myshell/bash/rc'
     if ! grep -Fq "$source_line" "$HOME/.bashrc"; then
@@ -74,10 +75,10 @@ EOF
 install_ghostty_config() {
   # Ghostty is assumed to be installed already.
   mkdir -p "$HOME/.config/ghostty"
-  cp "$REPO_ROOT/config/ghostty/config" "$HOME/.config/ghostty/config"
+  cp "$PROJECT_ROOT/config/ghostty/config" "$HOME/.config/ghostty/config"
 }
 
-echo "Installing dependencies + shell + nvim + ghostty from: $REPO_ROOT"
+echo "Installing dependencies + shell + nvim + ghostty from: $PROJECT_ROOT"
 echo "Shell config target: $MYSHELL_ROOT"
 
 ensure_homebrew
@@ -85,7 +86,7 @@ install_dependencies
 install_shell_config
 install_ghostty_config
 
-SKIP_NVIM_DEPS=1 "$REPO_ROOT/install-nvim-macos.sh"
+SKIP_NVIM_DEPS=1 "$SCRIPT_DIR/install-nvim-macos.sh"
 
 echo "Done."
 echo "Restart your shell, or run: source ~/.bashrc"
