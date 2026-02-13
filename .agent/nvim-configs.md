@@ -827,6 +827,24 @@ return {
 
 ```
 
+`nvim/lua/plugins/theme.lua`:
+
+```lua
+return {
+	{
+		"folke/tokyonight.nvim",
+		priority = 1000,
+	},
+	{
+		"LazyVim/LazyVim",
+		opts = {
+			colorscheme = "tokyonight-night",
+		},
+	},
+}
+
+```
+
 `nvim/plugin/after/transparency.lua`:
 
 ```lua

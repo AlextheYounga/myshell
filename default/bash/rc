@@ -1,6 +1,8 @@
-source ~/.local/share/omarchy/default/bash/shell
-source ~/.local/share/omarchy/default/bash/aliases
-source ~/.local/share/omarchy/default/bash/functions
-source ~/.local/share/omarchy/default/bash/init
-source ~/.local/share/omarchy/default/bash/envs
-[[ $- == *i* ]] && bind -f ~/.local/share/omarchy/default/bash/inputrc
+MYSHELL_CONFIG_ROOT="${MYSHELL_CONFIG_ROOT:-$HOME/.config/myshell}"
+
+source "$MYSHELL_CONFIG_ROOT/bash/shell"
+source "$MYSHELL_CONFIG_ROOT/bash/aliases"
+source "$MYSHELL_CONFIG_ROOT/bash/functions"
+source "$MYSHELL_CONFIG_ROOT/bash/init"
+source "$MYSHELL_CONFIG_ROOT/bash/envs"
+[[ $- == *i* ]] && bind -f "$MYSHELL_CONFIG_ROOT/bash/inputrc"
