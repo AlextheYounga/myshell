@@ -19,10 +19,10 @@ It is intentionally **Omarchy-inspired**, but it does **not** install into Omarc
 
 ## Install Entry Point
 
-From repo root:
+One liner: 
 
 ```bash
-./install.sh
+git clone https://github.com/AlextheYounga/myshell && cd myshell && ./install.sh
 ```
 
 To include Ghostty config:
