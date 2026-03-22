@@ -1,0 +1,58 @@
+add_newline = true
+command_timeout = 200
+format = "[$hostname$directory$git_branch$git_status${custom.git_diff_files}${custom.git_diff_add}${custom.git_diff_del}]($style)$character"
+
+[hostname]
+format = "[$hostname]($style) "
+ssh_only = false
+style = "bold yellow"
+
+[character]
+error_symbol = "[✗](bold cyan)"
+success_symbol = "[❯](bold cyan)"
+
+[directory]
+truncation_length = 2
+truncation_symbol = "…/"
+repo_root_style = "bold cyan"
+repo_root_format = "[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style) "
+
+[git_branch]
+format = "[$branch]($style) "
+style = "italic cyan"
+
+[git_status]
+format     = '[$all_status]($style)'
+style      = "cyan"
+ahead      = "⇡${count} "
+diverged   = "⇕⇡${ahead_count}⇣${behind_count} "
+behind     = "⇣${count} "
+conflicted = " "
+up_to_date = " "
+untracked  = "? "
+modified   = " "
+stashed    = ""
+staged     = ""
+renamed    = ""
+deleted    = ""
+
+[custom.git_diff_files]
+description = "Changed file count vs HEAD"
+command = "gitdiffstats --files"
+when = "git rev-parse --is-inside-work-tree >/dev/null 2>&1"
+format = "[$output]($style)"
+style = "cyan"
+
+[custom.git_diff_add]
+description = "Added lines vs HEAD"
+command = "gitdiffstats --adds"
+when = "git rev-parse --is-inside-work-tree >/dev/null 2>&1"
+format = " [$output]($style)"
+style = "green"
+
+[custom.git_diff_del]
+description = "Deleted lines vs HEAD"
+command = "gitdiffstats --dels"
+when = "git rev-parse --is-inside-work-tree >/dev/null 2>&1"
+format = " [$output]($style)"
+style = "red"

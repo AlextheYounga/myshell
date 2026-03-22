@@ -11,6 +11,24 @@ LOCAL_BIN="$HOME/.local/bin"
 GITDIFFSTATS_SRC="$SCRIPT_DIR/gitdiffstats.sh"
 GITDIFFSTATS_DST="$LOCAL_BIN/gitdiffstats"
 timestamp="$(date +%Y%m%d-%H%M%S)"
+REMOTE_INSTALL=0
+
+while (($# > 0)); do
+  case "$1" in
+  --remote)
+    REMOTE_INSTALL=1
+    SOURCE_STARSHIP="$PROJECT_ROOT/config/starship-remote.toml"
+    STARSHIP_FILE="/etc/starship.toml"
+    GITDIFFSTATS_DST="/usr/local/bin/gitdiffstats"
+    shift
+    ;;
+  *)
+    echo "Unknown argument: $1"
+    echo "Usage: ./install/install-nvim-linux.sh [--remote]"
+    exit 1
+    ;;
+  esac
+done
 
 if [[ "$(uname -s)" != "Linux" ]]; then
   echo "This installer is for Linux. Use ./install-nvim-macos.sh on macOS."
@@ -58,20 +76,37 @@ if [[ "${SKIP_NVIM_DEPS:-0}" != "1" ]]; then
   install_dependencies
 fi
 
-if [[ -d "$NVIM_DIR" ]]; then
-  mv "$NVIM_DIR" "${NVIM_DIR}.bak.${timestamp}"
-fi
-mkdir -p "$(dirname "$NVIM_DIR")"
-cp -R "$SOURCE_NVIM_DIR" "$NVIM_DIR"
+if [[ "$REMOTE_INSTALL" == "1" ]]; then
+  sudo mkdir -p "$(dirname "$STARSHIP_FILE")"
+  sudo cp "$SOURCE_STARSHIP" "$STARSHIP_FILE"
+  sudo sed -i 's|^command = "/usr/local/bin/gitdiffstats"|command = "gitdiffstats"|' "$STARSHIP_FILE"
+else
+  if [[ -d "$NVIM_DIR" ]]; then
+    mv "$NVIM_DIR" "${NVIM_DIR}.bak.${timestamp}"
+  fi
+  mkdir -p "$(dirname "$NVIM_DIR")"
+  cp -R "$SOURCE_NVIM_DIR" "$NVIM_DIR"
 
-mkdir -p "$(dirname "$STARSHIP_FILE")"
-cp "$SOURCE_STARSHIP" "$STARSHIP_FILE"
-sed -i 's|^command = "/usr/local/bin/gitdiffstats"|command = "gitdiffstats"|' "$STARSHIP_FILE"
+  mkdir -p "$(dirname "$STARSHIP_FILE")"
+  cp "$SOURCE_STARSHIP" "$STARSHIP_FILE"
+  sed -i 's|^command = "/usr/local/bin/gitdiffstats"|command = "gitdiffstats"|' "$STARSHIP_FILE"
+fi
 
 if [[ -f "$GITDIFFSTATS_SRC" ]]; then
-  mkdir -p "$LOCAL_BIN"
-  cp "$GITDIFFSTATS_SRC" "$GITDIFFSTATS_DST"
-  chmod +x "$GITDIFFSTATS_DST"
+  if [[ "$REMOTE_INSTALL" == "1" ]]; then
+    sudo mkdir -p "$(dirname "$GITDIFFSTATS_DST")"
+    sudo cp "$GITDIFFSTATS_SRC" "$GITDIFFSTATS_DST"
+    sudo chmod +x "$GITDIFFSTATS_DST"
+  else
+    mkdir -p "$LOCAL_BIN"
+    cp "$GITDIFFSTATS_SRC" "$GITDIFFSTATS_DST"
+    chmod +x "$GITDIFFSTATS_DST"
+  fi
+fi
+
+if [[ "$REMOTE_INSTALL" == "1" ]]; then
+  echo "Installed global starship config and gitdiffstats for remote shells."
+  exit 0
 fi
 
 if ! command -v nvim >/dev/null 2>&1; then
