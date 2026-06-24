@@ -266,11 +266,7 @@ else
   echo "Skipping Ghostty config by default. Use --with-ghostty to enable."
 fi
 
-if [[ "$REMOTE_INSTALL" == "1" ]]; then
-  SKIP_NVIM_DEPS=1 "$SCRIPT_DIR/install-nvim-linux.sh" --remote
-else
-  SKIP_NVIM_DEPS=1 "$SCRIPT_DIR/install-nvim-linux.sh"
-fi
+SKIP_NVIM_DEPS=1 "$SCRIPT_DIR/install-nvim-linux.sh"
 
 echo "Done."
 if [[ "$REMOTE_INSTALL" == "1" ]]; then

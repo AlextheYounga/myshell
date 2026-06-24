@@ -36,12 +36,6 @@ if [[ "$(uname -s)" != "Linux" ]]; then
   exit 1
 fi
 
-if [[ "$EUID" -eq 0 && "$REMOTE_INSTALL" != "1" ]]; then
-  echo "Do not run the per-user Neovim installer as root."
-  echo "Run ./install/install-nvim-linux.sh as the target user, or use --remote for a system-wide install."
-  exit 1
-fi
-
 ensure_apt() {
   if ! command -v apt-get >/dev/null 2>&1; then
     echo "This Linux installer currently supports Debian/Ubuntu (apt-get)."
@@ -155,6 +149,12 @@ if [[ "${SKIP_NVIM_DEPS:-0}" != "1" ]]; then
 fi
 
 if [[ "$REMOTE_INSTALL" == "1" ]]; then
+  if [[ -d "$NVIM_DIR" ]]; then
+    mv "$NVIM_DIR" "${NVIM_DIR}.bak.${timestamp}"
+  fi
+  mkdir -p "$(dirname "$NVIM_DIR")"
+  cp -R "$SOURCE_NVIM_DIR" "$NVIM_DIR"
+
   sudo mkdir -p "$(dirname "$STARSHIP_FILE")"
   sudo cp "$SOURCE_STARSHIP" "$STARSHIP_FILE"
   sudo sed -i 's|^command = "/usr/local/bin/gitdiffstats"|command = "gitdiffstats"|' "$STARSHIP_FILE"
@@ -180,11 +180,6 @@ if [[ -f "$GITDIFFSTATS_SRC" ]]; then
     cp "$GITDIFFSTATS_SRC" "$GITDIFFSTATS_DST"
     chmod +x "$GITDIFFSTATS_DST"
   fi
-fi
-
-if [[ "$REMOTE_INSTALL" == "1" ]]; then
-  echo "Installed global starship config and gitdiffstats for remote shells."
-  exit 0
 fi
 
 if ! command -v nvim >/dev/null 2>&1; then
