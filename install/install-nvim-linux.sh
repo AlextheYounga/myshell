@@ -147,6 +147,7 @@ if [[ "${SKIP_NVIM_DEPS:-0}" != "1" ]]; then
   ensure_apt
   install_dependencies
 fi
+ensure_neovim
 
 if [[ "$REMOTE_INSTALL" == "1" ]]; then
   if [[ -d "$NVIM_DIR" ]]; then
@@ -182,8 +183,8 @@ if [[ -f "$GITDIFFSTATS_SRC" ]]; then
   fi
 fi
 
-if ! command -v nvim >/dev/null 2>&1; then
-  echo "Neovim installation failed or nvim is not on PATH."
+if ! nvim_meets_min_version; then
+  echo "Neovim $NVIM_MIN_VERSION+ installation failed or nvim is not first on PATH."
   exit 1
 fi
 
