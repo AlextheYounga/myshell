@@ -80,7 +80,6 @@ install_neovim_release() {
   esac
 
   tmp_dir="$(mktemp -d)"
-  trap 'rm -rf "$tmp_dir"' RETURN
   curl -fsSL "https://github.com/neovim/neovim/releases/latest/download/$asset" -o "$tmp_dir/nvim.tar.gz"
 
   if [[ "$REMOTE_INSTALL" == "1" ]]; then
@@ -103,6 +102,7 @@ install_neovim_release() {
 
   PATH="$bin_dir:$PATH"
   hash -r
+  rm -rf "$tmp_dir"
 }
 
 ensure_neovim() {
