@@ -33,6 +33,12 @@ if [[ "$(uname -s)" != "Linux" ]]; then
   exit 1
 fi
 
+if [[ "$EUID" -eq 0 && "$REMOTE_INSTALL" != "1" ]]; then
+  echo "Do not run the per-user installer as root."
+  echo "Run ./install.sh as the target user, or use ./install.sh --remote for a system-wide install."
+  exit 1
+fi
+
 ensure_apt() {
   if ! command -v apt-get >/dev/null 2>&1; then
     echo "This Linux installer currently supports Debian/Ubuntu (apt-get)."
@@ -61,6 +67,7 @@ install_dependencies() {
       curl -fsSL https://starship.rs/install.sh | sudo sh -s -- -y -b /usr/local/bin
     fi
   elif ! command -v starship >/dev/null 2>&1; then
+      mkdir -p "$HOME/.local/bin"
       curl -fsSL https://starship.rs/install.sh | sh -s -- -y -b "$HOME/.local/bin"
   fi
 
@@ -69,6 +76,7 @@ install_dependencies() {
       curl -fsSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sudo sh -s -- --bin-dir /usr/local/bin
     fi
   elif ! command -v zoxide >/dev/null 2>&1; then
+      mkdir -p "$HOME/.local/bin"
       curl -fsSL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
   fi
 

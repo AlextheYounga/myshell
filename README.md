@@ -31,6 +31,12 @@ To include Ghostty config:
 ./install.sh --with-ghostty
 ```
 
+Do not run the default installer as root. It is a per-user install and writes to the current user's home directory. For a system-wide Linux install, use:
+
+```bash
+sudo ./install.sh --remote
+```
+
 `install.sh` detects OS and dispatches to:
 
 - macOS: `install/install-macos.sh`

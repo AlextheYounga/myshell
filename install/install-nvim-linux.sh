@@ -35,6 +35,12 @@ if [[ "$(uname -s)" != "Linux" ]]; then
   exit 1
 fi
 
+if [[ "$EUID" -eq 0 && "$REMOTE_INSTALL" != "1" ]]; then
+  echo "Do not run the per-user Neovim installer as root."
+  echo "Run ./install/install-nvim-linux.sh as the target user, or use --remote for a system-wide install."
+  exit 1
+fi
+
 ensure_apt() {
   if ! command -v apt-get >/dev/null 2>&1; then
     echo "This Linux installer currently supports Debian/Ubuntu (apt-get)."
