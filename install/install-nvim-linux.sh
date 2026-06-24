@@ -12,6 +12,7 @@ GITDIFFSTATS_SRC="$SCRIPT_DIR/gitdiffstats.sh"
 GITDIFFSTATS_DST="$LOCAL_BIN/gitdiffstats"
 timestamp="$(date +%Y%m%d-%H%M%S)"
 REMOTE_INSTALL=0
+NVIM_MIN_VERSION="${NVIM_MIN_VERSION:-0.11.0}"
 
 while (($# > 0)); do
   case "$1" in
@@ -48,6 +49,73 @@ ensure_apt() {
   fi
 }
 
+nvim_version() {
+  if ! command -v nvim >/dev/null 2>&1; then
+    return 1
+  fi
+
+  nvim --version | sed -n '1s/^NVIM v\([0-9][^[:space:]]*\).*/\1/p'
+}
+
+nvim_meets_min_version() {
+  local version
+  version="$(nvim_version || true)"
+  [[ -n "$version" ]] && dpkg --compare-versions "$version" ge "$NVIM_MIN_VERSION"
+}
+
+install_neovim_release() {
+  local arch asset install_dir bin_dir tmp_dir
+
+  case "$(uname -m)" in
+  x86_64 | amd64)
+    asset="nvim-linux-x86_64.tar.gz"
+    ;;
+  aarch64 | arm64)
+    asset="nvim-linux-arm64.tar.gz"
+    ;;
+  *)
+    echo "Unsupported architecture for official Neovim release: $(uname -m)"
+    exit 1
+    ;;
+  esac
+
+  tmp_dir="$(mktemp -d)"
+  trap 'rm -rf "$tmp_dir"' RETURN
+  curl -fsSL "https://github.com/neovim/neovim/releases/latest/download/$asset" -o "$tmp_dir/nvim.tar.gz"
+
+  if [[ "$REMOTE_INSTALL" == "1" ]]; then
+    install_dir="/opt/nvim"
+    bin_dir="/usr/local/bin"
+    sudo rm -rf "$install_dir"
+    sudo mkdir -p "$install_dir" "$bin_dir"
+    tar -xzf "$tmp_dir/nvim.tar.gz" -C "$tmp_dir"
+    sudo cp -R "$tmp_dir"/nvim-linux-*/* "$install_dir/"
+    sudo ln -sf "$install_dir/bin/nvim" "$bin_dir/nvim"
+  else
+    install_dir="$HOME/.local/opt/nvim"
+    bin_dir="$HOME/.local/bin"
+    rm -rf "$install_dir"
+    mkdir -p "$install_dir" "$bin_dir"
+    tar -xzf "$tmp_dir/nvim.tar.gz" -C "$tmp_dir"
+    cp -R "$tmp_dir"/nvim-linux-*/* "$install_dir/"
+    ln -sf "$install_dir/bin/nvim" "$bin_dir/nvim"
+  fi
+}
+
+ensure_neovim() {
+  if nvim_meets_min_version; then
+    return
+  fi
+
+  echo "Installing Neovim $NVIM_MIN_VERSION+ from official release."
+  install_neovim_release
+
+  if ! nvim_meets_min_version; then
+    echo "Neovim $NVIM_MIN_VERSION+ installation failed or nvim is not first on PATH."
+    exit 1
+  fi
+}
+
 install_dependencies() {
   sudo apt-get update
   sudo apt-get install -y \
@@ -56,9 +124,10 @@ install_dependencies() {
     fd-find \
     fzf \
     git \
-    neovim \
     ripgrep \
     unzip
+
+  ensure_neovim
 
   mkdir -p "$HOME/.local/bin"
   if command -v fdfind >/dev/null 2>&1 && ! command -v fd >/dev/null 2>&1; then

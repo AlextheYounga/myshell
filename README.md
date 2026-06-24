@@ -183,15 +183,17 @@ Installs apt packages:
 - `fd-find`
 - `fzf`
 - `git`
-- `neovim`
 - `ripgrep`
 - `tmux`
 - `unzip`
 
 Also installs if missing:
 
+- `neovim` 0.11+ via the official GitHub release tarball when the current `nvim` is missing or too old
 - `starship` via official install script
 - `zoxide` via official install script
+
+In `--remote` mode, Neovim is installed to `/opt/nvim` and symlinked at `/usr/local/bin/nvim`. The distro `neovim` package may remain installed, but `/usr/local/bin/nvim` should take precedence on normal Linux PATHs.
 
 Creates compatibility symlinks in `~/.local/bin`:
 
@@ -244,5 +246,4 @@ After editing files in this repo:
 
 - No built-in `--dry-run` flag yet.
 - Linux installer is not universal across all distributions.
-
 
