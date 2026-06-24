@@ -189,7 +189,7 @@ Installs apt packages:
 
 Also installs if missing:
 
-- `neovim` 0.11+ via the official GitHub release tarball when the current `nvim` is missing or too old
+- `neovim` 0.11.2+ via the official GitHub release tarball when the current `nvim` is missing or too old
 - `starship` via official install script
 - `zoxide` via official install script
 
@@ -246,4 +246,3 @@ After editing files in this repo:
 
 - No built-in `--dry-run` flag yet.
 - Linux installer is not universal across all distributions.
-

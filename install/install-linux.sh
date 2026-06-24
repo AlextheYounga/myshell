@@ -8,7 +8,7 @@ WITH_GHOSTTY=0
 REMOTE_INSTALL=0
 PROFILE_SCRIPT_PATH="/etc/profile.d/myshell.sh"
 BASH_BASHRC_PATH="/etc/bash.bashrc"
-NVIM_MIN_VERSION="${NVIM_MIN_VERSION:-0.11.0}"
+NVIM_MIN_VERSION="${NVIM_MIN_VERSION:-0.11.2}"
 
 while (($# > 0)); do
   case "$1" in

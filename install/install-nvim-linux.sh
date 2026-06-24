@@ -12,7 +12,7 @@ GITDIFFSTATS_SRC="$SCRIPT_DIR/gitdiffstats.sh"
 GITDIFFSTATS_DST="$LOCAL_BIN/gitdiffstats"
 timestamp="$(date +%Y%m%d-%H%M%S)"
 REMOTE_INSTALL=0
-NVIM_MIN_VERSION="${NVIM_MIN_VERSION:-0.11.0}"
+NVIM_MIN_VERSION="${NVIM_MIN_VERSION:-0.11.2}"
 
 while (($# > 0)); do
   case "$1" in
