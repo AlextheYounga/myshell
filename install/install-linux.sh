@@ -98,6 +98,9 @@ install_neovim_release() {
     cp -R "$tmp_dir"/nvim-linux-*/* "$install_dir/"
     ln -sf "$install_dir/bin/nvim" "$bin_dir/nvim"
   fi
+
+  PATH="$bin_dir:$PATH"
+  hash -r
 }
 
 ensure_neovim() {
